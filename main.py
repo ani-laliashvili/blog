@@ -25,7 +25,7 @@ else:
     load_dotenv(dotenv_path=os.path.join(BASEDIR, '.env'))
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",  "sqlite:///blog.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",  "sqlite:///blog.db").replace('postgres', 'postgresql')
 
 ckeditor = CKEditor(app)
 Bootstrap(app)
