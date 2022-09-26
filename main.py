@@ -19,15 +19,13 @@ from dotenv import load_dotenv
 app = Flask(__name__)
 if os.environ.get('SECRET_KEY') != None:
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 else:
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
     # Connect the path with the '.env' file name
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     load_dotenv(dotenv_path=os.path.join(BASEDIR, '.env'))
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL",  "sqlite:///blog.db")
 
 ckeditor = CKEditor(app)
 Bootstrap(app)
