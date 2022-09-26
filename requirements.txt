@@ -21,3 +21,4 @@ Werkzeug==2.2.2
 WTForms==3.0.1
 python-dotenv==0.21.0
 gunicorn==20.1.0
+email-validator==1.1.2
