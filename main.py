@@ -16,12 +16,18 @@ import os
 from dotenv import load_dotenv
 
 
-# Connect the path with the '.env' file name
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(dotenv_path=os.path.join(BASEDIR, '.env'))
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+if os.environ.get('SECRET_KEY') != None:
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+else:
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+    # Connect the path with the '.env' file name
+    BASEDIR = os.path.abspath(os.path.dirname(__file__))
+    load_dotenv(dotenv_path=os.path.join(BASEDIR, '.env'))
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
 
 ckeditor = CKEditor(app)
 Bootstrap(app)
@@ -36,7 +42,7 @@ gravatar = Gravatar(app,
                     base_url=None)
 
 ##CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')#'sqlite:///blog.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
