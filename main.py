@@ -89,7 +89,7 @@ class Comment(UserMixin, db.Model):
 
     text = db.Column(db.Text, nullable=False)
 
-#db.create_all()
+db.create_all()
 
 class RegisterForm(FlaskForm):
     email = StringField(label='Email', validators=[DataRequired(message='Field required'), Email(message='Invalid email address')])
