@@ -12,9 +12,18 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 from forms import CreatePostForm
 from flask_gravatar import Gravatar
 from functools import wraps
+import os
+from dotenv import load_dotenv
+
+
+# Connect the path with the '.env' file name
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(dotenv_path=os.path.join(BASEDIR, '.env'))
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+secret_key = os.getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = secret_key
+
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
