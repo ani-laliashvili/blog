@@ -14,7 +14,9 @@ from flask_gravatar import Gravatar
 from functools import wraps
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
+year = datetime.now().year
 
 app = Flask(__name__)
 if os.environ.get('SECRET_KEY') != None:
@@ -121,7 +123,7 @@ def load_user(user_id):
 @app.route('/')
 def get_all_posts():
     posts = BlogPost.query.all()
-    return render_template("index.html", all_posts=posts)
+    return render_template("index.html", all_posts=posts, year=year)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -142,12 +144,12 @@ def register():
             db.session.commit()
         else:
             flash("You've already signed up with that email, log in instead.")
-            return redirect(url_for('login'))
+            return redirect(url_for('login', year=year))
 
-        return redirect(url_for('login'))
+        return redirect(url_for('login', year=year))
 
 
-    return render_template("register.html", form=register_form)
+    return render_template("register.html", form=register_form, year=year)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -157,21 +159,21 @@ def login():
         user = User.query.filter_by(email=request.form.get('email')).first()
         if not user:
             flash('User does not exist. Please register.')
-            return redirect(url_for('register'))
+            return redirect(url_for('register', year=year))
         elif check_password_hash(user.password, request.form.get('password')):
             login_user(user)
             next = request.args.get('next')
-            return redirect(url_for('get_all_posts'))
+            return redirect(url_for('get_all_posts', year=year))
         else:
             flash('Password incorrect. Please try again.')
             return redirect(url_for('login'))
-    return render_template("login.html", form=login_form)
+    return render_template("login.html", form=login_form, year=year)
 
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('get_all_posts'))
+    return redirect(url_for('get_all_posts', year=year))
 
 
 @app.route("/post/<int:post_id>", methods=['GET', 'POST'])
@@ -183,22 +185,25 @@ def show_post(post_id):
                               text=form.body.data)
         db.session.add(new_comment)
         db.session.commit()
-        return redirect(url_for('show_post', post_id=post_id))
+        return redirect(url_for('show_post', post_id=post_id, year=year))
     elif request.method == 'POST':
-        return redirect(url_for('login'))
+        return redirect(url_for('login', year=year))
 
     requested_post = BlogPost.query.get(post_id)
-    return render_template("post.html", post=requested_post, form=form, comments=requested_post.comments)
+    return render_template("post.html", post=requested_post, form=form, comments=requested_post.comments, year=year)
 
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    return render_template("about.html", year=year)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
-    return render_template("contact.html")
+    if request.method == 'POST':
+        return render_template("contact.html", year=year)
+    elif request.method == 'GET':
+        return render_template("contact.html", year=year)
 
 
 @app.route("/new-post", methods=['GET', 'POST'])
@@ -216,8 +221,8 @@ def add_new_post():
         )
         db.session.add(new_post)
         db.session.commit()
-        return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form)
+        return redirect(url_for("get_all_posts", year=year))
+    return render_template("make-post.html", form=form, year=year)
 
 
 @app.route("/edit-post/<int:post_id>")
@@ -238,9 +243,9 @@ def edit_post(post_id):
         post.author = edit_form.author.data
         post.body = edit_form.body.data
         db.session.commit()
-        return redirect(url_for("show_post", post_id=post.id))
+        return redirect(url_for("show_post", post_id=post.id, year=year))
 
-    return render_template("make-post.html", form=edit_form)
+    return render_template("make-post.html", form=edit_form, year=year)
 
 
 @app.route("/delete/<int:post_id>")
@@ -249,7 +254,7 @@ def delete_post(post_id):
     post_to_delete = BlogPost.query.get(post_id)
     db.session.delete(post_to_delete)
     db.session.commit()
-    return redirect(url_for('get_all_posts'))
+    return redirect(url_for('get_all_posts'), year=year)
 
 
 if __name__ == "__main__":
